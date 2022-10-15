@@ -1,3 +1,4 @@
+# Carregando pacotes para Scrap inicial
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
@@ -15,6 +16,7 @@ new_header = sorteios.iloc[0]
 sorteios = sorteios[1:]
 sorteios.columns = new_header
 
+# Configurando os links dos resultados
 url_base = 'https://www.economia.go.gov.br'
 
 url_resultados = []
@@ -29,6 +31,7 @@ for i in table.find_all('a'):
 
 sorteios['links'] = url_resultados
 
+# Links dos PDFs
 url_pdf = []
 for link in sorteios.links:
     page = requests.get(link)
@@ -41,6 +44,7 @@ for link in sorteios.links:
 
 sorteios['url_pdf'] = url_pdf
 
+# Baixar os PDFs
 from urllib import request
 
 for index in sorteios.index:
@@ -48,15 +52,18 @@ for index in sorteios.index:
 
 sorteios.columns = ['n_sorteio', 'realizacao', 'url_resultado', 'url_pdf']
 
+# Conectando no BD
 from sqlalchemy import create_engine
 
 engine = create_engine('sqlite:///dados/nf-goiana.db')
 
+# Se o scrap trouxe dados novos, adiciona
 sorteios_ = pd.read_sql('SELECT n_sorteio FROM SORTEIOS', con=engine)
 
 sorteios = sorteios[~sorteios.n_sorteio.isin(sorteios_.n_sorteio)]
 sorteios.to_sql(name='sorteios', con=engine, index=False, if_exists='append')
 
+# Definindo função de ler os PDFs
 import numpy as np
 
 def read_pdfs(file):
@@ -89,6 +96,7 @@ dicionario = {
     'Prêmio': 'n_premio'
 }
 
+# Definindo função de tratar as tabelas dos PDFs
 def trataTabela(temp, sorteio):
     new_header = temp.iloc[0]
     temp = temp[1:]
@@ -112,6 +120,7 @@ def trataTabela(temp, sorteio):
         temp['uf'] = np.nan
     return temp
 
+# Tratamento dos dados
 resultados = pd.DataFrame()
 for i in sorteios.n_sorteio:
     temp = read_pdfs(i)
@@ -125,6 +134,7 @@ for i in resultados[resultados.valor_premio.isna()].index:
     resultados.loc[i, 'valor_premio'] = re.findall(r'[\d.,]+', 'GOIAS 1.000,00')[0]
     resultados.loc[i, 'uf'] = re.sub(r'[\d.,]+', '', 'GOIAS 1.000,00').strip()
 
+# Criptografando os nomes
 from cryptography.fernet import Fernet
 import os
 
@@ -138,6 +148,7 @@ for index in resultados.index:
 
 resultados.drop(columns='nome', inplace=True)
 
+# Recuperando UFs
 municipios = pd.read_csv('dados/municipios.csv')
 
 dicionario_municipios = dict(zip(municipios.nome_simples, municipios.uf_simples))
@@ -155,4 +166,5 @@ resultados.municipio.replace(mun_dict, inplace=True)
 
 resultados.uf.fillna(resultados.municipio.map(dicionario_municipios), inplace=True)
 
+# Salvando os resultados no BD
 resultados.to_sql(name = 'resultados', con=engine, index=False, if_exists='append')

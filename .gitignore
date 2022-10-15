@@ -3,3 +3,5 @@ dados/pdf
 dados/tabela
 teste.ipynb
 venv/
+.env
+*.pem
