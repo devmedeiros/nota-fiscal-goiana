@@ -53,9 +53,20 @@ for index in sorteios.index:
 sorteios.columns = ['n_sorteio', 'realizacao', 'url_resultado', 'url_pdf']
 
 # Conectando no BD
+from dotenv import load_dotenv
+load_dotenv()
+import os
 from sqlalchemy import create_engine
 
-engine = create_engine('sqlite:///dados/nf-goiana.db')
+args = {
+            'user': os.getenv("USERNAME"),
+            'password': os.getenv("PASSWORD"),
+            'host': os.getenv("HOST"),
+            'database': os.getenv("DATABASE"),
+            'ssl': {'ca': 'cacert.pem'}
+        }
+
+engine = create_engine('mysql+pymysql://{user}:{pass}@{host}/{db}', connect_args=args)
 
 # Se o scrap trouxe dados novos, adiciona
 sorteios_ = pd.read_sql('SELECT n_sorteio FROM SORTEIOS', con=engine)
