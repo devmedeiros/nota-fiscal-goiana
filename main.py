@@ -44,12 +44,7 @@ for link in sorteios.links:
 
 sorteios['url_pdf'] = url_pdf
 
-# Baixar os PDFs
-from urllib import request
-
-for index in sorteios.index:
-    response = request.urlretrieve(sorteios.loc[index, 'url_pdf'], 'dados/pdf'+sorteios.loc[index, 'Número do Sorteio'][:2]+'.pdf')
-
+# Organizando as colunas
 sorteios.columns = ['n_sorteio', 'realizacao', 'url_resultado', 'url_pdf']
 
 # Conectando no BD
@@ -79,9 +74,9 @@ import numpy as np
 
 def read_pdfs(file):
     try:
-        data = tb.read_pdf('dados/pdf/'+str(file)+'.pdf', pages = 'all', pandas_options={'header': None})
+        data = tb.read_pdf(file, pages = 'all', pandas_options={'header': None})
     except:
-        data = tb.read_pdf('dados/pdf/'+str(file)+'.pdf', pages = 'all', pandas_options={'header': None}, stream=True)
+        data = tb.read_pdf(file, pages = 'all', pandas_options={'header': None}, stream=True)
         if not (data[0].shape[1] == data[1].shape[1] == data[2].shape[1]):
             data[0] = data[0][data[0].columns[data[0].isnull().mean() < 0.9]]
             data[0].columns = range(len(data[0].columns))
@@ -133,9 +128,9 @@ def trataTabela(temp, sorteio):
 
 # Tratamento dos dados
 resultados = pd.DataFrame()
-for i in sorteios.n_sorteio:
-    temp = read_pdfs(i)
-    temp = trataTabela(temp, i)
+for index in sorteios.index:
+    temp = read_pdfs(sorteios.loc[index, 'url_pdf'])
+    temp = trataTabela(temp, sorteios.loc[index, 'n_sorteio'])
     resultados = pd.concat([resultados, temp])
 
 resultados = resultados.loc[:,['n_sorteio', 'n_premio', 'n_bilhete', 'nome', 'municipio', 'uf', 'valor_premio']]
@@ -177,5 +172,31 @@ resultados.municipio.replace(mun_dict, inplace=True)
 
 resultados.uf.fillna(resultados.municipio.map(dicionario_municipios), inplace=True)
 
+# Afirmando tipos
+dresultados = {
+    'n_sorteio': 'int64',
+    'n_premio': 'int64',
+    'n_bilhete': 'object',
+    'municipio': 'object',
+    'uf': 'object',
+    'valor_premio': 'float',
+    'nome_encriptado': 'object'
+    
+}
+
+resultados.astype(dresultados)
+
 # Salvando os resultados no BD
-resultados.to_sql(name = 'resultados', con=engine, index=False, if_exists='append')
+from sqlalchemy import Integer, String, Numeric
+dtypes = {
+    'n_sorteio': Integer,
+    'n_premio': Integer,
+    'n_bilhete': String(200),
+    'municipio': String(200),
+    'uf': String(200),
+    'valor_premio': Numeric,
+    'nome_encriptado': String(200)
+    
+}
+
+resultados.to_sql(name = 'resultados', con=engine, index=False, if_exists='append', dtype=dtypes)
