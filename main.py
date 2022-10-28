@@ -47,6 +47,10 @@ sorteios['url_pdf'] = url_pdf
 # Organizando as colunas
 sorteios.columns = ['n_sorteio', 'realizacao', 'url_resultado', 'url_pdf']
 
+# Formatando n_sorteio para ter apenas 2 dígitos
+for i in sorteios.index:
+    sorteios.loc[i, 'n_sorteio'] = sorteios.loc[i, 'n_sorteio'][:2]
+
 # Conectando no BD
 from dotenv import load_dotenv
 load_dotenv()
@@ -67,6 +71,7 @@ engine = create_engine('mysql+pymysql://{user}:{pass}@{host}/{db}', connect_args
 sorteios_ = pd.read_sql('SELECT n_sorteio FROM SORTEIOS', con=engine)
 
 sorteios = sorteios[~sorteios.n_sorteio.isin(sorteios_.n_sorteio)]
+
 sorteios.to_sql(name='sorteios', con=engine, index=False, if_exists='append')
 
 # Definindo função de ler os PDFs
