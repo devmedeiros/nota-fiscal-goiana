@@ -8,7 +8,7 @@ import re
 url = 'https://www.economia.go.gov.br/sorteios/index.php?option=com_content&view=article&layout=edit&id=7388'
 page = requests.get(url)
 
-soup = BeautifulSoup(page.text)
+soup = BeautifulSoup(page.text, features="lxml")
 
 table = soup.find('table')
 sorteios = pd.read_html(str(table))[0]
@@ -35,7 +35,7 @@ sorteios['links'] = url_resultados
 url_pdf = []
 for link in sorteios.links:
     page = requests.get(link)
-    soup = BeautifulSoup(page.text)
+    soup = BeautifulSoup(page.text, features="lxml")
     url_ = soup.find('a', attrs={'class': 'btn btn-success'})['href']
     if url_[0] == 'h':
         url_pdf.append(url_)
@@ -68,7 +68,7 @@ args = {
 engine = create_engine('mysql+pymysql://{user}:{pass}@{host}/{db}', connect_args=args)
 
 # Se o scrap trouxe dados novos, adiciona
-sorteios_ = pd.read_sql('SELECT n_sorteio FROM SORTEIOS', con=engine)
+sorteios_ = pd.read_sql('SELECT n_sorteio FROM sorteios', con=engine)
 
 sorteios = sorteios[~sorteios.n_sorteio.isin(sorteios_.n_sorteio)]
 
