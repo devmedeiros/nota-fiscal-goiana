@@ -4,7 +4,6 @@ dados/tabela
 teste.ipynb
 venv/
 .env
-*.pem
 diagrama projeto.png
 diagrama relacional.png
 teste2.ipynb
