@@ -54,13 +54,12 @@ for i in sorteios.index:
 # Conectando no BD
 from dotenv import load_dotenv
 load_dotenv()
-
+import os
 modules = dir()
 
 print(modules)
 print(os.environ)
 
-import os
 from sqlalchemy import create_engine
 
 args = {
