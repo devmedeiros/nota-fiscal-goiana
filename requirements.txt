@@ -18,6 +18,7 @@ ipython==8.5.0
 jedi==0.18.1
 jupyter-core==4.11.1
 jupyter_client==7.4.2
+lxml==4.9.1
 matplotlib-inline==0.1.6
 mysql-connector-python==8.0.31
 mysqlclient==2.1.1
