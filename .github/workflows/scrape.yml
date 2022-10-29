@@ -24,4 +24,10 @@ jobs:
       - name: Copy cacert
         run: cp cacert.pem out
       - name: Run Scraper
+        env:
+          DATABASE: ${{ secrets.DATABASE }}
+          HOST: ${{ secrets.HOST }}
+          KEY_GOIANA: ${{ secrets.KEY_GOIANA }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          USERNAME: $${{ secrets.USERNAME }}
         run: python main.py
