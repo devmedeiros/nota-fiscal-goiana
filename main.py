@@ -189,6 +189,9 @@ dresultados = {
     
 }
 
+# Corrigindo o formato do valor do prêmio
+resultados.valor_premio = resultados.valor_premio.str.replace(',00', '', regex=True).str.replace('.', '', regex=True)
+
 resultados.astype(dresultados)
 
 # Salvando os resultados no BD
