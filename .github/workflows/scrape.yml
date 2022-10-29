@@ -29,5 +29,5 @@ jobs:
           HOST: ${{ secrets.HOST }}
           KEY_GOIANA: ${{ secrets.KEY_GOIANA }}
           PASSWORD: ${{ secrets.PASSWORD }}
-          USERNAME: $${{ secrets.USERNAME }}
+          USERNAME: ${{ secrets.USERNAME }}
         run: python main.py
