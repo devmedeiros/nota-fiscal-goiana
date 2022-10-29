@@ -1,5 +1,5 @@
 # Nota Fiscal Goiana
-<p align="center"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="license - mit"> <img src="https://img.shields.io/badge/Status-Development-2ea44f" alt="status - development"></p>
+<p align="center"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="license - mit"> <img src="https://img.shields.io/badge/Status-Development-2ea44f" alt="status - development"> <a href="https://github.com/devmedeiros/nota-fiscal-goiana/actions/workflows/scrape.yml"><img src="https://github.com/devmedeiros/nota-fiscal-goiana/actions/workflows/scrape.yml/badge.svg"></a> </p>
 
 Este projeto faz a coleta dos resultados do programa Nota Fiscal Goiana, trata os dados e os salva em um banco de dados online MySQL. Além disso os dados são apresentados num _dashboard_ de Power BI.
 
@@ -15,7 +15,7 @@ Esse projeto executa um processo ETL (_Extract, Transform, and Load_), a extraç
 
 O script python foi salvo no arquivo `main.py` e está agendado para rodar no dia 5 de todos os meses pelo Github Actions, o banco de dados é MySQL e está disponível online, assim o Github Actions consegue executar o processo de ETL sem a necessidade de intervenção humana.
 
-Um relatório interativo de Power BI exibindo os dados coletados está disponível aqui. Abaixo possui a arquitetura do projeto.
+Um relatório interativo de Power BI exibindo os dados coletados está disponível [aqui](https://app.powerbi.com/view?r=eyJrIjoiMzRhZTVjNGEtNzk2YS00YzIxLWE4NmItN2ZmNDkwM2MzNzY0IiwidCI6IjI2ZjA4NzIyLTFjOWUtNGVkZS1iN2VkLThhMmI3N2ZmM2Q5YyJ9). Abaixo possui a arquitetura do projeto.
 
 ![diagrama projeto](https://user-images.githubusercontent.com/33239902/197660134-750effed-85af-4231-a765-48148a9eb0b5.png)
 
