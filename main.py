@@ -72,139 +72,144 @@ sorteios_ = pd.read_sql('SELECT n_sorteio FROM sorteios', con=engine)
 
 sorteios = sorteios[~sorteios.n_sorteio.isin(sorteios_.n_sorteio)]
 
-sorteios.to_sql(name='sorteios', con=engine, index=False, if_exists='append')
+if not sorteios.empty:
 
-# Definindo função de ler os PDFs
-import numpy as np
+    sorteios.to_sql(name='sorteios', con=engine, index=False, if_exists='append')
 
-def read_pdfs(file):
-    try:
-        data = tb.read_pdf(file, pages = 'all', pandas_options={'header': None})
-    except:
-        data = tb.read_pdf(file, pages = 'all', pandas_options={'header': None}, stream=True)
-        if not (data[0].shape[1] == data[1].shape[1] == data[2].shape[1]):
-            data[0] = data[0][data[0].columns[data[0].isnull().mean() < 0.9]]
-            data[0].columns = range(len(data[0].columns))
+    # Definindo função de ler os PDFs
+    import numpy as np
 
-            data[1] = data[1][data[1].columns[data[1].isnull().mean() < 0.9]]
-            data[1].columns = range(len(data[1].columns))
+    def read_pdfs(file):
+        try:
+            data = tb.read_pdf(file, pages = 'all', pandas_options={'header': None})
+        except:
+            data = tb.read_pdf(file, pages = 'all', pandas_options={'header': None}, stream=True)
+            if not (data[0].shape[1] == data[1].shape[1] == data[2].shape[1]):
+                data[0] = data[0][data[0].columns[data[0].isnull().mean() < 0.9]]
+                data[0].columns = range(len(data[0].columns))
 
-            data[2] = data[2][data[2].columns[data[2].isnull().mean() < 0.9]]
-            data[2].columns = range(len(data[2].columns))
-    data = pd.concat([data[0],data[1],data[2]])
-    return data
+                data[1] = data[1][data[1].columns[data[1].isnull().mean() < 0.9]]
+                data[1].columns = range(len(data[1].columns))
 
-dicionario = {
-    'No Prêmio': 'n_premio',
-    'No Bilhete': 'n_bilhete',
-    'Nome': 'nome',
-    'Valor Prêmio*': 'valor_premio',
-    'Município': 'municipio',
-    'UF': 'uf',
-    'No': 'n_premio',
-    'No Sorteio': 'n_sorteio',
-    'No Premio': 'n_premio',
-    'Prêmio': 'n_premio'
-}
+                data[2] = data[2][data[2].columns[data[2].isnull().mean() < 0.9]]
+                data[2].columns = range(len(data[2].columns))
+        data = pd.concat([data[0],data[1],data[2]])
+        return data
 
-# Definindo função de tratar as tabelas dos PDFs
-def trataTabela(temp, sorteio):
-    new_header = temp.iloc[0]
-    temp = temp[1:]
-    temp.columns = new_header
-    temp.rename(columns=dicionario, inplace=True)
+    dicionario = {
+        'No Prêmio': 'n_premio',
+        'No Bilhete': 'n_bilhete',
+        'Nome': 'nome',
+        'Valor Prêmio*': 'valor_premio',
+        'Município': 'municipio',
+        'UF': 'uf',
+        'No': 'n_premio',
+        'No Sorteio': 'n_sorteio',
+        'No Premio': 'n_premio',
+        'Prêmio': 'n_premio'
+    }
 
-    if temp.columns.isna().sum() == 1:
-        if not ('municipio' in temp.columns):
-            temp.columns = temp.columns.fillna('municipio')
-        elif not ('nome' in temp.columns):
-            temp.columns = temp.columns.fillna('nome')
-        elif not ('valor_premio' in temp.columns):
-            temp.columns = temp.columns.fillna('valor_premio')
-    else:
-        temp.columns.values[int(np.where(temp.columns == 'n_bilhete')[0])+1] = 'nome'
-        temp.columns.values[int(np.where(temp.columns == 'nome')[0])+1] = 'municipio'
-    if not ('n_sorteio' in temp.columns):
-        temp['n_sorteio'] = str(sorteio)
-    temp.n_sorteio = temp.n_sorteio.astype(str).str.strip()
-    if not ('uf' in temp.columns):
-        temp['uf'] = np.nan
-    return temp
+    # Definindo função de tratar as tabelas dos PDFs
+    def trataTabela(temp, sorteio):
+        new_header = temp.iloc[0]
+        temp = temp[1:]
+        temp.columns = new_header
+        temp.rename(columns=dicionario, inplace=True)
 
-# Tratamento dos dados
-resultados = pd.DataFrame()
-for index in sorteios.index:
-    temp = read_pdfs(sorteios.loc[index, 'url_pdf'])
-    temp = trataTabela(temp, sorteios.loc[index, 'n_sorteio'])
-    resultados = pd.concat([resultados, temp])
+        if temp.columns.isna().sum() == 1:
+            if not ('municipio' in temp.columns):
+                temp.columns = temp.columns.fillna('municipio')
+            elif not ('nome' in temp.columns):
+                temp.columns = temp.columns.fillna('nome')
+            elif not ('valor_premio' in temp.columns):
+                temp.columns = temp.columns.fillna('valor_premio')
+        else:
+            temp.columns.values[int(np.where(temp.columns == 'n_bilhete')[0])+1] = 'nome'
+            temp.columns.values[int(np.where(temp.columns == 'nome')[0])+1] = 'municipio'
+        if not ('n_sorteio' in temp.columns):
+            temp['n_sorteio'] = str(sorteio)
+        temp.n_sorteio = temp.n_sorteio.astype(str).str.strip()
+        if not ('uf' in temp.columns):
+            temp['uf'] = np.nan
+        return temp
 
-resultados = resultados.loc[:,['n_sorteio', 'n_premio', 'n_bilhete', 'nome', 'municipio', 'uf', 'valor_premio']]
-resultados.reset_index(drop=True, inplace=True)
+    # Tratamento dos dados
+    resultados = pd.DataFrame()
+    for index in sorteios.index:
+        temp = read_pdfs(sorteios.loc[index, 'url_pdf'])
+        temp = trataTabela(temp, sorteios.loc[index, 'n_sorteio'])
+        resultados = pd.concat([resultados, temp])
 
-for i in resultados[resultados.valor_premio.isna()].index:
-    resultados.loc[i, 'valor_premio'] = re.findall(r'[\d.,]+', 'GOIAS 1.000,00')[0]
-    resultados.loc[i, 'uf'] = re.sub(r'[\d.,]+', '', 'GOIAS 1.000,00').strip()
+    resultados = resultados.loc[:,['n_sorteio', 'n_premio', 'n_bilhete', 'nome', 'municipio', 'uf', 'valor_premio']]
+    resultados.reset_index(drop=True, inplace=True)
 
-# Criptografando os nomes
-from cryptography.fernet import Fernet
-import os
+    for i in resultados[resultados.valor_premio.isna()].index:
+        resultados.loc[i, 'valor_premio'] = re.findall(r'[\d.,]+', 'GOIAS 1.000,00')[0]
+        resultados.loc[i, 'uf'] = re.sub(r'[\d.,]+', '', 'GOIAS 1.000,00').strip()
 
-KEY_GOIANA = os.environ.get('KEY_GOIANA')
+    # Criptografando os nomes
+    from cryptography.fernet import Fernet
+    import os
 
-fernet = Fernet(KEY_GOIANA)
+    KEY_GOIANA = os.environ.get('KEY_GOIANA')
 
-resultados['nome_encriptado'] = np.nan
-for index in resultados.index:
-    resultados.loc[index, 'nome_encriptado'] = fernet.encrypt(resultados.loc[index, 'nome'].encode()).decode('utf-8')
+    fernet = Fernet(KEY_GOIANA)
 
-resultados.drop(columns='nome', inplace=True)
+    resultados['nome_encriptado'] = np.nan
+    for index in resultados.index:
+        resultados.loc[index, 'nome_encriptado'] = fernet.encrypt(resultados.loc[index, 'nome'].encode()).decode('utf-8')
 
-# Recuperando UFs
-municipios = pd.read_csv('dados/municipios.csv')
+    resultados.drop(columns='nome', inplace=True)
 
-dicionario_municipios = dict(zip(municipios.nome_simples, municipios.uf_simples))
+    # Recuperando UFs
+    municipios = pd.read_csv('dados/municipios.csv')
 
-resultados.municipio = resultados.municipio.str.strip()
+    dicionario_municipios = dict(zip(municipios.nome_simples, municipios.uf_simples))
 
-mun_dict = {
-    'JARDIM ABC DE GOIAS': 'CIDADE OCIDENTAL',
-    'DOMICIANO RIBEIRO': 'CRISTALINA',
-    'CLAUDINAPOLIS': 'NAZARIO',
-    'GOIAPORA': 'AMORINOPOLIS'
-}
+    resultados.municipio = resultados.municipio.str.strip()
 
-resultados.municipio.replace(mun_dict, inplace=True)
+    mun_dict = {
+        'JARDIM ABC DE GOIAS': 'CIDADE OCIDENTAL',
+        'DOMICIANO RIBEIRO': 'CRISTALINA',
+        'CLAUDINAPOLIS': 'NAZARIO',
+        'GOIAPORA': 'AMORINOPOLIS'
+    }
 
-resultados.uf.fillna(resultados.municipio.map(dicionario_municipios), inplace=True)
+    resultados.municipio.replace(mun_dict, inplace=True)
 
-# Afirmando tipos
-dresultados = {
-    'n_sorteio': 'int64',
-    'n_premio': 'int64',
-    'n_bilhete': 'object',
-    'municipio': 'object',
-    'uf': 'object',
-    'valor_premio': 'float',
-    'nome_encriptado': 'object'
-    
-}
+    resultados.uf.fillna(resultados.municipio.map(dicionario_municipios), inplace=True)
 
-# Corrigindo o formato do valor do prêmio
-resultados.valor_premio = resultados.valor_premio.str.replace(',00', '', regex=True).str.replace('.', '', regex=True)
+    # Afirmando tipos
+    dresultados = {
+        'n_sorteio': 'int64',
+        'n_premio': 'int64',
+        'n_bilhete': 'object',
+        'municipio': 'object',
+        'uf': 'object',
+        'valor_premio': 'float',
+        'nome_encriptado': 'object'
+        
+    }
 
-resultados.astype(dresultados)
+    # Corrigindo o formato do valor do prêmio
+    resultados.valor_premio = resultados.valor_premio.str.replace(',00', '', regex=True).str.replace('.', '', regex=True)
 
-# Salvando os resultados no BD
-from sqlalchemy import Integer, String, Numeric
-dtypes = {
-    'n_sorteio': Integer,
-    'n_premio': Integer,
-    'n_bilhete': String(200),
-    'municipio': String(200),
-    'uf': String(200),
-    'valor_premio': Numeric,
-    'nome_encriptado': String(200)
-    
-}
+    resultados.astype(dresultados)
 
-resultados.to_sql(name = 'resultados', con=engine, index=False, if_exists='append', dtype=dtypes)
+    # Salvando os resultados no BD
+    from sqlalchemy import Integer, String, Numeric
+    dtypes = {
+        'n_sorteio': Integer,
+        'n_premio': Integer,
+        'n_bilhete': String(200),
+        'municipio': String(200),
+        'uf': String(200),
+        'valor_premio': Numeric,
+        'nome_encriptado': String(200)
+        
+    }
+
+    resultados.to_sql(name = 'resultados', con=engine, index=False, if_exists='append', dtype=dtypes)
+
+else:
+    print("Nenhum resultado novo encontrado")
