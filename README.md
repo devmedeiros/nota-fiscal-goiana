@@ -15,7 +15,7 @@ Esse projeto executa um processo ETL (_Extract, Transform, and Load_), a extraç
 
 O script python foi salvo no arquivo `main.py` e está agendado para rodar no dia 5 de todos os meses pelo Github Actions, o banco de dados é MySQL e está disponível online, assim o Github Actions consegue executar o processo de ETL sem a necessidade de intervenção humana.
 
-Um relatório interativo de Power BI exibindo os dados coletados está disponível [aqui](https://app.powerbi.com/view?r=eyJrIjoiMzRhZTVjNGEtNzk2YS00YzIxLWE4NmItN2ZmNDkwM2MzNzY0IiwidCI6IjI2ZjA4NzIyLTFjOWUtNGVkZS1iN2VkLThhMmI3N2ZmM2Q5YyJ9). Abaixo possui a arquitetura do projeto.
+Um relatório interativo de Power BI exibindo os dados coletados está disponível [aqui](https://app.powerbi.com/view?r=eyJrIjoiOTEyNTkyYjgtOTk2OS00NWNiLThmNzMtZGQ3MjBjYzM4YTA2IiwidCI6ImIxY2E3YTgxLWFiZjgtNDJlNS05OGM2LWYyZjJhOTMwYmEzNiJ9). Abaixo possui a arquitetura do projeto.
 
 ![diagrama projeto](https://user-images.githubusercontent.com/33239902/197660134-750effed-85af-4231-a765-48148a9eb0b5.png)
 
