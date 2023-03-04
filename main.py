@@ -106,7 +106,8 @@ if not sorteios.empty:
         'No': 'n_premio',
         'No Sorteio': 'n_sorteio',
         'No Premio': 'n_premio',
-        'Prêmio': 'n_premio'
+        'Prêmio': 'n_premio',
+        'Prêmio*': 'valor_premio'
     }
 
     # Definindo função de tratar as tabelas dos PDFs
