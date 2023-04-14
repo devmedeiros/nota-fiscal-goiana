@@ -9,7 +9,7 @@ Para conhecer mais sobre o programa visite o [site oficial](https://www.economia
 
 ## Como funciona essa projeto?
 
-Esse projeto executa um processo ETL (_Extract, Transform, and Load_), a extração é feita através do Python usando técnicas de _web-scraping_ e antes de salvar no banco é verificado se a informação encontrada é nova e se for, salva o primeiro _data frame_ **sorteios** no banco. Após isso é necessário encontrar os vencedores do sorteio, cada sorteio tem seu resultado divulgado no Diário da União e no próprio site do programa é anexado um PDF, neste projeto é extraído os vencedores lendo o PDF e transformando suas informações para um formato mais legível e completo. Quando o segundo e último _data frame_ está no formato correto ele é acrescentado ao banco de dados, agora numa tabela chamada **resultados**.
+Esse projeto   executa um processo ETL (_Extract, Transform, and Load_), a extração é feita através do Python usando técnicas de _web-scraping_ e antes de salvar no banco é verificado se a informação encontrada é nova e se for, salva o primeiro _data frame_ **sorteios** no banco. Após isso é necessário encontrar os vencedores do sorteio, cada sorteio tem seu resultado divulgado no Diário da União e no próprio site do programa é anexado um PDF, neste projeto é extraído os vencedores lendo o PDF e transformando suas informações para um formato mais legível e completo. Quando o segundo e último _data frame_ está no formato correto ele é acrescentado ao banco de dados, agora numa tabela chamada **resultados**.
 
 ![diagrama relacional](https://user-images.githubusercontent.com/33239902/197660147-b6df90ba-c1b0-41b0-9e1a-92a419e6a25b.png)
 
