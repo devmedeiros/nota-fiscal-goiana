@@ -56,7 +56,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 from sqlalchemy import create_engine
-
+'''
 args = {
             'user': os.getenv("USERNAME"),
             'password': os.getenv("PASSWORD"),
@@ -65,6 +65,8 @@ args = {
         }
 
 engine = create_engine('mysql+pymysql://{user}:{pass}@{host}/{db}', connect_args=args)
+'''
+engine = create_engine('sqlite:///dados/nf-goiana.db')
 
 # Se o scrap trouxe dados novos, adiciona
 sorteios_ = pd.read_sql('SELECT n_sorteio FROM sorteios', con=engine)
