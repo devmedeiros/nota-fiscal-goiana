@@ -61,8 +61,7 @@ args = {
             'user': os.getenv("USERNAME"),
             'password': os.getenv("PASSWORD"),
             'host': os.getenv("HOST"),
-            'database': os.getenv("DATABASE"),
-            'ssl': {'ca': 'cacert.pem'}
+            'database': os.getenv("DATABASE")
         }
 
 engine = create_engine('mysql+pymysql://{user}:{pass}@{host}/{db}', connect_args=args)
