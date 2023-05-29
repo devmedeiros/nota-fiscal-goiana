@@ -22,10 +22,12 @@ jobs:
       - name: Install requirements
         run: pip3 install -r requirements.txt
       - name: Run Scraper
-        env:
-          DATABASE: ${{ secrets.DATABASE }}
-          HOST: ${{ secrets.HOST }}
-          KEY_GOIANA: ${{ secrets.KEY_GOIANA }}
-          PASSWORD: ${{ secrets.PASSWORD }}
-          USERNAME: ${{ secrets.USERNAME }}
         run: python main.py
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "devmedeiros"
+          git config --global user.email "medeirosestatistica@gmail.com"
+
+          git add -A
+          git commit -m "new scraped data"
+          git push
