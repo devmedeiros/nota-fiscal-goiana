@@ -31,5 +31,5 @@ jobs:
           git config --global user.email "medeirosestatistica@gmail.com"
 
           git add -A
-          git commit -m "new scraped data"
+          git diff --quiet && git diff --staged --quiet || git commit -am "new scraped data"
           git push
