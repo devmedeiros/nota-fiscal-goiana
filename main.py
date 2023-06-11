@@ -1,9 +1,18 @@
 # Carregando pacotes para Scrap inicial
 from bs4 import BeautifulSoup
 import requests
+import re
+import os
 import pandas as pd
 import tabula as tb
-import re
+import numpy as np
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy import Integer, String, Numeric
+from cryptography.fernet import Fernet
+
+# Carregando variáveis de ambiente
+load_dotenv()
 
 url = 'https://www.economia.go.gov.br/sorteios/index.php?option=com_content&view=article&layout=edit&id=7388'
 page = requests.get(url)
@@ -52,10 +61,7 @@ for i in sorteios.index:
     sorteios.loc[i, 'n_sorteio'] = sorteios.loc[i, 'n_sorteio'][:2]
 
 # Conectando no BD
-from dotenv import load_dotenv
-load_dotenv()
-import os
-from sqlalchemy import create_engine
+
 '''
 args = {
             'user': os.getenv("USERNAME"),
@@ -73,13 +79,29 @@ sorteios_ = pd.read_sql('SELECT n_sorteio FROM sorteios', con=engine)
 
 sorteios = sorteios[~sorteios.n_sorteio.isin(sorteios_.n_sorteio)]
 
+# Afirmando tipo dos sorteios
+dsorteios = {
+        'n_sorteio': 'int64',
+        'realizado': 'object',
+        'url_resultado': 'object',
+        'url_pdf': 'object'
+    }
+
+sorteios = sorteios.astype(dsorteios)
+
+dtypes = {
+        'n_sorteio': Integer,
+        'realizado': String(200),
+        'url_resultado': String(200),
+        'url_pdf': String(200)
+    }
+
 if not sorteios.empty:
 
-    sorteios.to_sql(name='sorteios', con=engine, index=False, if_exists='append')
+    sorteios.to_sql(name='sorteios', con=engine, index=False, if_exists='append', dtype=dtypes)
 
     # Definindo função de ler os PDFs
-    import numpy as np
-
+    
     def read_pdfs(file):
         try:
             data = tb.read_pdf(file, pages = 'all', pandas_options={'header': None})
@@ -150,8 +172,6 @@ if not sorteios.empty:
         resultados.loc[i, 'uf'] = re.sub(r'[\d.,]+', '', 'GOIAS 1.000,00').strip()
 
     # Criptografando os nomes
-    from cryptography.fernet import Fernet
-    import os
 
     KEY_GOIANA = os.environ.get('KEY_GOIANA')
 
@@ -190,16 +210,14 @@ if not sorteios.empty:
         'uf': 'object',
         'valor_premio': 'float',
         'nome_encriptado': 'object'
-        
     }
 
     # Corrigindo o formato do valor do prêmio
     resultados.valor_premio = resultados.valor_premio.str.replace(',00', '', regex=True).str.replace('.', '', regex=True)
 
-    resultados.astype(dresultados)
+    resultados = resultados.astype(dresultados)
 
     # Salvando os resultados no BD
-    from sqlalchemy import Integer, String, Numeric
     dtypes = {
         'n_sorteio': Integer,
         'n_premio': Integer,
