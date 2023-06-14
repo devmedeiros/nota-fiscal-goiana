@@ -82,7 +82,7 @@ sorteios = sorteios[~sorteios.n_sorteio.isin(sorteios_.n_sorteio)]
 # Afirmando tipo dos sorteios
 dsorteios = {
         'n_sorteio': 'int64',
-        'realizado': 'object',
+        'realizacao': 'object',
         'url_resultado': 'object',
         'url_pdf': 'object'
     }
@@ -91,7 +91,7 @@ sorteios = sorteios.astype(dsorteios)
 
 dtypes = {
         'n_sorteio': Integer,
-        'realizado': String(200),
+        'realizacao': String(200),
         'url_resultado': String(200),
         'url_pdf': String(200)
     }
