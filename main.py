@@ -58,7 +58,7 @@ sorteios.columns = ['n_sorteio', 'realizacao', 'url_resultado', 'url_pdf']
 
 # Formatando n_sorteio para ter apenas 2 dígitos
 for i in sorteios.index:
-    sorteios.loc[i, 'n_sorteio'] = sorteios.loc[i, 'n_sorteio'][:2]
+    sorteios.loc[i, 'n_sorteio'] = int(sorteios.loc[i, 'n_sorteio'][:2])
 
 # Conectando no BD
 
