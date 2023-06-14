@@ -24,10 +24,13 @@ jobs:
       - name: Install requirements
         run: pip3 install -r requirements.txt
 
-      - name: Run Scraper
+      - name: Run main.py
         env:
           KEY_GOIANA: ${{ secrets.KEY_GOIANA }}
         run: python main.py
+
+      - name: Run arrecadacao.py
+        run: python arrecadacao.py
 
       - name: Commit changes
         run: |
