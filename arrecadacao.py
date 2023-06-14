@@ -24,7 +24,7 @@ for link in soup.find_all('a'):
 anomes = [str(x[-10:][:6]) for x in links]
 temp = pd.DataFrame({'anomes': anomes, 'links': links})
 arrecadacao_ = pd.read_sql("select ano||substr('0'||mes, -2) as anomes from arrecadacao", con=engine)
-temp[~temp['anomes'].isin(arrecadacao_['anomes'])]
+temp = temp[~temp['anomes'].isin(arrecadacao_['anomes'])]
 
 # Lendo dados novos
 if not temp.empty:
