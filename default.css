@@ -1,0 +1,12 @@
+.custom-header {
+    color:  #454545; 
+    font-size: 28px; 
+    font-weight: bold; 
+    text-align: center;
+}
+
+.custom-iframe {
+    width: 100%;
+    height: calc(100vh - 70px); /* Subtract the navbar height from the viewport height */
+    border: none;
+  }
