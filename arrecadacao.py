@@ -3,6 +3,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 from bs4 import BeautifulSoup
 import requests
+from datetime import date
 
 engine = create_engine('sqlite:///dados/nf-goiana.db')
 
@@ -34,13 +35,14 @@ if not temp.empty:
         arrecadacao = pd.concat([arrecadacao, temp[temp['TIPO_RECEITA'] == 'ICMS']])
 
     # Formatando as informações
+    arrecadacao.reset_index(drop=True, inplace=True)
+
     arrecadacao['ano'] = [int(str(x)[:4]) for x in arrecadacao['ANO_MES']]
     arrecadacao['mes'] = [int(str(x)[-2:]) for x in arrecadacao['ANO_MES']]
     arrecadacao['total'] = [pd.to_numeric(x.replace(',', '.')) for x in arrecadacao['VALR_TOTAL']]
+    arrecadacao['data_arrecadacao'] = [date(year=arrecadacao.ano[i], month=arrecadacao.mes[i], day=1) for i in arrecadacao.index]
 
-    arrecadacao.reset_index(drop=True, inplace=True)
-
-    arrecadacao = arrecadacao[['ano', 'mes', 'total']]
+    arrecadacao = arrecadacao[['ano', 'mes', 'data_arrecadacao', 'total']]
 
     # Salvando as informações novas
     arrecadacao.to_sql(name = 'arrecadacao', con=engine, index=False, if_exists='append')
