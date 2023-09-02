@@ -60,23 +60,11 @@ sorteios.columns = ['n_sorteio', 'realizacao', 'url_resultado', 'url_pdf']
 for i in sorteios.index:
     sorteios.loc[i, 'n_sorteio'] = int(sorteios.loc[i, 'n_sorteio'][:2])
 
-# Conectando no BD
-
-'''
-args = {
-            'user': os.getenv("USERNAME"),
-            'password': os.getenv("PASSWORD"),
-            'host': os.getenv("HOST"),
-            'database': os.getenv("DATABASE")
-        }
-
-engine = create_engine('mysql+pymysql://{user}:{pass}@{host}/{db}', connect_args=args)
-'''
+# Criando conexão com o database
 engine = create_engine('sqlite:///dados/nf-goiana.db')
 
 # Se o scrap trouxe dados novos, adiciona
 sorteios_ = pd.read_sql('SELECT n_sorteio FROM sorteios', con=engine)
-
 sorteios = sorteios[~sorteios.n_sorteio.isin(sorteios_.n_sorteio)]
 
 # Afirmando tipo dos sorteios
@@ -97,11 +85,10 @@ dtypes = {
     }
 
 if not sorteios.empty:
-
+    # Salvando sorteios no banco de dados
     sorteios.to_sql(name='sorteios', con=engine, index=False, if_exists='append', dtype=dtypes)
 
     # Definindo função de ler os PDFs
-    
     def read_pdfs(file):
         try:
             data = tb.read_pdf(file, pages = 'all', pandas_options={'header': None})
@@ -172,7 +159,6 @@ if not sorteios.empty:
         resultados.loc[i, 'uf'] = re.sub(r'[\d.,]+', '', 'GOIAS 1.000,00').strip()
 
     # Criptografando os nomes
-
     KEY_GOIANA = os.environ.get('KEY_GOIANA')
 
     fernet = Fernet(KEY_GOIANA)
