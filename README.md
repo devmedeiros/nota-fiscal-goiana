@@ -21,33 +21,27 @@ Entre no diretório do projeto
 Instale os pacotes necessários
 
 ```bash
-  pip install scripts/requirements.txt
+  pip install requirements.txt
 ```
 
 Rode `nfg_scrape.py` para executar o scraper da Nota Fiscal Goiana
 
 ```bash
-  python nfg_scrape.py
+  python src/data/nfg_scrape.py
 ```
 
 Rode `arrecadacao_scrape.py` para executar o scraper da Arrecadação Estadual
 
 ```bash
-  python arrecadacao_scrape.py
+  python src/data/arrecadacao_scrape.py
 ```
 
 ### Para rodar o Streamlit App
 
-Instale os pacotes necessários
-
-```bash
-  pip install requirements.txt
-```
-
 Rode `app.py`
 
 ```bash
-  python app.py
+  streamlit run src/visualization/app.py
 ```
 
 ## Stack utilizada
