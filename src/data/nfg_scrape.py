@@ -61,10 +61,10 @@ for i in sorteios.index:
     sorteios.loc[i, 'n_sorteio'] = int(sorteios.loc[i, 'n_sorteio'][:2])
 
 # Criando conexão com o database
-engine = create_engine('sqlite:///dados/nf-goiana.db')
+engine = create_engine('sqlite:///../database/nf-goiana.db')
 
 # Se o scrap trouxe dados novos, adiciona
-sorteios_ = pd.read_sql('SELECT n_sorteio FROM sorteios', con=engine)
+sorteios_ = pd.read_sql('select n_sorteio from sorteios', con=engine)
 sorteios = sorteios[~sorteios.n_sorteio.isin(sorteios_.n_sorteio)]
 
 # Afirmando tipo dos sorteios
@@ -170,7 +170,7 @@ if not sorteios.empty:
     resultados.drop(columns='nome', inplace=True)
 
     # Recuperando UFs
-    municipios = pd.read_csv('dados/municipios.csv')
+    municipios = pd.read_sql('select nome_simples, uf_simples from municipios', con=engine)
 
     dicionario_municipios = dict(zip(municipios.nome_simples, municipios.uf_simples))
 
