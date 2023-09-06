@@ -76,7 +76,7 @@ st.title('Acompanhamento dos Sorteios')
 col1, col2, col3 = st.columns(3)
 col1.metric("Sorteios Acompanhados", f'{len(sorteios.n_sorteio)}/{max(sorteios.n_sorteio)}')
 col2.metric("Último Sorteio", f'{max(sorteios.realizacao)}')
-col3.metric("Total Sorteado", f'{sum(resultados["soma_premio"]}')
+col3.metric("Total Sorteado", f'{sum(resultados["soma_premio"])}')
 
 st.markdown('---')
 
