@@ -5,7 +5,6 @@ import streamlit as st
 import pandas as pd
 from sqlalchemy import create_engine
 import datetime
-import locale
 import plotly.express as px
 
 # Definindo configurações da página
@@ -14,9 +13,6 @@ st.set_page_config(
         page_icon="chart_with_upwards_trend",
         layout="wide",
     )
-
-# Definindo a região
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 # Criando a conexão dos dados
 engine = create_engine('sqlite:///database/nf-goiana.db')
@@ -80,14 +76,11 @@ st.title('Acompanhamento dos Sorteios')
 col1, col2, col3 = st.columns(3)
 col1.metric("Sorteios Acompanhados", f'{len(sorteios.n_sorteio)}/{max(sorteios.n_sorteio)}')
 col2.metric("Último Sorteio", f'{max(sorteios.realizacao)}')
-col3.metric("Total Sorteado", f'{locale.currency(sum(resultados["soma_premio"]), grouping=True)[:-3]}')
+col3.metric("Total Sorteado", f'{sum(resultados["soma_premio"]}')
 
 st.markdown('---')
 
 # ------------------------------------------------------------------------------------------------------------
-# Formatando valores monetários
-resultados.soma_premio = [locale.currency(x, grouping=True)[:-3] for x in resultados.soma_premio]
-resultados.media_premio = [locale.currency(x, grouping=True)[:-3] for x in resultados.media_premio]
 
 # Dicionário para renomear colunas
 config_dict = {
