@@ -21,10 +21,48 @@ locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 # Criando a conexão dos dados
 engine = create_engine('sqlite:///database/nf-goiana.db')
 
-# Carregando os dados
+# ------------------------------------------------------------------------------------------------------------
+# Definindo a barra lateral
+# ------------------------------------------------------------------------------------------------------------
+
+# Carregando os filtros
+opcoes_uf = pd.read_sql('select distinct m.uf_nome from municipios m inner join resultados r on m.nome_simples = r.municipio and r.uf = m.uf_simples order by 1', con=engine)
+opcoes_municipios = pd.read_sql('select distinct m.municipio from municipios m inner join resultados r on m.nome_simples = r.municipio and r.uf = m.uf_simples order by 1', con=engine)
+
+with st.sidebar:
+    st.title('Filtros')
+
+    selecao_uf = st.multiselect('Unidade Federativa', opcoes_uf, placeholder='Escolha uma opção')
+    selecao_municipio = st.multiselect('Município', opcoes_municipios, placeholder='Escolha uma opção')
+
+    st.markdown('---')
+
+    #st.markdown('''Desenvolvido e mantido por [Jaqueline Medeiros](http://devmedeiros.com/pt/about/). O código fonte e os dados podem ser acessados no ![github-logo](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWdpdGh1YiI+PHBhdGggZD0iTTE1IDIydi00YTQuOCA0LjggMCAwIDAtMS0zLjVjMyAwIDYtMiA2LTUuNS4wOC0xLjI1LS4yNy0yLjQ4LTEtMy41LjI4LTEuMTUuMjgtMi4zNSAwLTMuNSAwIDAtMSAwLTMgMS41LTIuNjQtLjUtNS4zNi0uNS04IDBDNiAyIDUgMiA1IDJjLS4zIDEuMTUtLjMgMi4zNSAwIDMuNUE1LjQwMyA1LjQwMyAwIDAgMCA0IDljMCAzLjUgMyA1LjUgNiA1LjUtLjM5LjQ5LS42OCAxLjA1LS44NSAxLjY1LS4xNy42LS4yMiAxLjIzLS4xNSAxLjg1djQiLz48cGF0aCBkPSJNOSAxOGMtNC41MSAyLTUtMi03LTIiLz48L3N2Zz4=) 
+    #[repositório](https://github.com/devmedeiros/nota-fiscal-goiana/).''')
+
+# ------------------------------------------------------------------------------------------------------------
+# Definindo o corpo principal
+# ------------------------------------------------------------------------------------------------------------
+
 sorteios = pd.read_sql('select n_sorteio, realizacao from sorteios', con=engine)
 
-resultados_query = """
+# Filtro UF
+if len(selecao_uf) == 0:
+    segmentacao_uf = str(tuple([str(i) for i in opcoes_uf['uf_nome']]))
+elif len(selecao_uf) == 1:
+    segmentacao_uf = f"('{selecao_uf[0]}')"
+else:
+    segmentacao_uf = str(tuple([str(i) for i in selecao_uf]))
+
+# Filtro Município
+if len(selecao_municipio) == 0:
+    segmentacao_municipio = str(tuple([str(i) for i in opcoes_municipios['municipio']]))
+elif len(selecao_municipio) == 1:
+    segmentacao_municipio = f"('{selecao_municipio[0]}')"
+else:
+    segmentacao_municipio = str(tuple([str(i) for i in selecao_municipio]))
+
+resultados_query = f"""
 select 
 	coalesce(m.municipio, '-') municipio,
 	coalesce(m.uf_nome, '-') uf,
@@ -36,6 +74,9 @@ select
 from 
 	resultados r
 	left join municipios m on m.nome_simples = r.municipio and r.uf = m.uf_simples
+where
+    m.uf_nome in {segmentacao_uf}
+    and m.municipio in {segmentacao_municipio}
 group by 
 	1,2,6,7
 order by 
@@ -53,21 +94,6 @@ from
     left join (select date(data_arrecadacao, '-1 month') data_ante, "total" total_y from arrecadacao) b on b.data_ante = a.data_arrecadacao;
 """
 arrecadacao = pd.read_sql(arrecadacao_query, con=engine, parse_dates={"data_arrecadacao": {'format': '%Y-%m-%d'}})
-
-# ------------------------------------------------------------------------------------------------------------
-# Definindo a barra lateral
-# ------------------------------------------------------------------------------------------------------------
-
-with st.sidebar:
-    st.title('Filtros')
-
-    uf = st.multiselect('Unidade Federativa', resultados.uf.drop_duplicates().sort_values(), placeholder='Escolha uma opção')  #trocar pela versão bonita
-    municipio = st.multiselect('Município', resultados.municipio.sort_values(), placeholder='Escolha uma opção') #trocar pela versão bonita
-
-    st.markdown('---')
-
-    #st.markdown('''Desenvolvido e mantido por [Jaqueline Medeiros](http://devmedeiros.com/pt/about/). O código fonte e os dados podem ser acessados no ![github-logo](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWdpdGh1YiI+PHBhdGggZD0iTTE1IDIydi00YTQuOCA0LjggMCAwIDAtMS0zLjVjMyAwIDYtMiA2LTUuNS4wOC0xLjI1LS4yNy0yLjQ4LTEtMy41LjI4LTEuMTUuMjgtMi4zNSAwLTMuNSAwIDAtMSAwLTMgMS41LTIuNjQtLjUtNS4zNi0uNS04IDBDNiAyIDUgMiA1IDJjLS4zIDEuMTUtLjMgMi4zNSAwIDMuNUE1LjQwMyA1LjQwMyAwIDAgMCA0IDljMCAzLjUgMyA1LjUgNiA1LjUtLjM5LjQ5LS42OCAxLjA1LS44NSAxLjY1LS4xNy42LS4yMiAxLjIzLS4xNSAxLjg1djQiLz48cGF0aCBkPSJNOSAxOGMtNC41MSAyLTUtMi03LTIiLz48L3N2Zz4=) 
-    #[repositório](https://github.com/devmedeiros/nota-fiscal-goiana/).''')
 
 # ------------------------------------------------------------------------------------------------------------
 # Definindo o corpo principal
@@ -97,25 +123,10 @@ config_dict = {
     'soma_premio': 'Soma dos Prêmios',
     'qtde_premio': 'Qtde Prêmios'}
 
-# Criar string da quuery condicional
-query_condicional = []
-
-if uf:
-    query_condicional.append(f"uf == {uf}")
-else:
-    query_condicional.append(f"uf == {list(resultados.uf.drop_duplicates().sort_values())}")
-if municipio:
-    query_condicional.append(f"municipio == {municipio}")
-else:
-    query_condicional.append(f"uf == {list(resultados.municipio.sort_values())}")
-
-# Combine the conditions into a single query string
-query = ' and '.join(query_condicional)
-
 # Resumo da distribuição do sorteio
 with st.container():
     col1, col2 = st.columns([2, 1])
-    col1.dataframe(data=resultados.iloc[:,:5].query(query), hide_index=True, column_config=config_dict, use_container_width=True, height=400)
+    col1.dataframe(data=resultados.iloc[:,:5], hide_index=True, column_config=config_dict, use_container_width=True, height=400)
     p1 = px.scatter_mapbox(resultados[~resultados.latitude.isnull()], lat='latitude', lon='longitude', hover_name="municipio",
      hover_data=['uf', 'soma_premio', 'media_premio', 'qtde_premio'], zoom=3, color_discrete_sequence=['#FCC016'], height=400)
     p1.update_layout(mapbox_style="open-street-map")
