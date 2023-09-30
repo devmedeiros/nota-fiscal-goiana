@@ -20,3 +20,5 @@ soupsieve==2.3.2.post1
 SQLAlchemy==1.4.42
 tabula-py==2.5.1
 urllib3==1.26.12
+streamlit==1.26.0
+plotly-express==0.4.1
