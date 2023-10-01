@@ -14,6 +14,10 @@ from cryptography.fernet import Fernet
 # Carregando variáveis de ambiente
 load_dotenv()
 
+# Definindo caminhos
+caminho_script = os.path.dirname(os.path.abspath(__file__))
+caminho_db = os.path.abspath(os.path.join(caminho_script, '../../database/nf-goiana.db'))
+
 url = 'https://www.economia.go.gov.br/sorteios/index.php?option=com_content&view=article&layout=edit&id=7388'
 page = requests.get(url)
 
@@ -61,7 +65,7 @@ for i in sorteios.index:
     sorteios.loc[i, 'n_sorteio'] = int(sorteios.loc[i, 'n_sorteio'][:2])
 
 # Criando conexão com o database
-engine = create_engine('sqlite:///../database/nf-goiana.db')
+engine = create_engine(f'sqlite:///{caminho_db}')
 
 # Se o scrap trouxe dados novos, adiciona
 sorteios_ = pd.read_sql('select n_sorteio from sorteios', con=engine)

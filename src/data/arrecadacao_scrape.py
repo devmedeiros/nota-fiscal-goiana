@@ -4,8 +4,14 @@ from sqlalchemy import create_engine
 from bs4 import BeautifulSoup
 import requests
 from datetime import date
+import os
 
-engine = create_engine('sqlite:///dados/nf-goiana.db')
+# Definindo caminhos
+caminho_script = os.path.dirname(os.path.abspath(__file__))
+caminho_db = os.path.abspath(os.path.join(caminho_script, '../../database/nf-goiana.db'))
+
+# Criando engine
+engine = create_engine(f'sqlite:///{caminho_db}')
 
 url = 'http://www.transparencia.go.gov.br/dadosabertos/index.php?dir=arrecadacao%2F'
 page = requests.get(url)
