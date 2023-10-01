@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 from bs4 import BeautifulSoup
 import requests
 from datetime import date
+import os
 
 # Definindo caminhos
 caminho_script = os.path.dirname(os.path.abspath(__file__))
