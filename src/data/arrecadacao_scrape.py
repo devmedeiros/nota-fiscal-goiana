@@ -3,8 +3,12 @@ import pandas as pd
 from sqlalchemy import create_engine
 from bs4 import BeautifulSoup
 import requests
-from datetime import date
+from datetime import date, datetime
 import os
+import re
+import locale
+
+locale.setlocale(locale.LC_ALL, 'pt_PT.UTF-8')
 
 # Definindo caminhos
 caminho_script = os.path.dirname(os.path.abspath(__file__))
@@ -13,31 +17,48 @@ caminho_db = os.path.abspath(os.path.join(caminho_script, '../../database/nf-goi
 # Criando engine
 engine = create_engine(f'sqlite:///{caminho_db}')
 
-url = 'http://www.transparencia.go.gov.br/dadosabertos/index.php?dir=arrecadacao%2F'
+url = 'https://dadosabertos.go.gov.br/dataset/arrecadacao'
 page = requests.get(url)
 
 soup = BeautifulSoup(page.text, features="lxml")
 
 # Configurando os links dos resultados
-url_base = 'http://www.transparencia.go.gov.br/dadosabertos/'
+url_base = 'https://dadosabertos.go.gov.br'
 
 # Links dos csvs
 links = []
+titulos = []
 for link in soup.find_all('a'):
-    if link.get('href').endswith('.csv'):
+    if link.find('span', {'data-format': 'csv'}):
         links.append(url_base + link.get('href'))
+        titulos.append(link.get('title'))
 
 # Checando dados que já foram coletados
-anomes = [str(x[-10:][:6]) for x in links]
-temp = pd.DataFrame({'anomes': anomes, 'links': links})
-arrecadacao_ = pd.read_sql("select ano||substr('0'||mes, -2) as anomes from arrecadacao", con=engine)
-temp = temp[~temp['anomes'].isin(arrecadacao_['anomes'])]
+padrao = r'\b\w+/\d{4}\b'
+datas = [datetime.strptime(re.search(padrao, string)[0], '%B/%Y').strftime('%Y-%m-%d') for string in titulos if re.search(padrao, string)]
+temp = pd.DataFrame({'data_arrecadacao': datas, 'links': links})
+arrecadacao_ = pd.read_sql("select data_arrecadacao from arrecadacao", con=engine)
+temp = temp[~temp['data_arrecadacao'].isin(arrecadacao_['data_arrecadacao'])]
+
+# Função para acessar a página que estão os CSVs e pegar o URL de download
+def downloadCSV(url):
+    inner_page = requests.get(url)
+    inner_soup = BeautifulSoup(inner_page.text, features="lxml")
+    unique_links = set()
+    for link in inner_soup.find_all('a'):
+        href = link.get('href')
+        if href and href.endswith('.csv') and href not in unique_links:
+            unique_links.add(href)
+    if len(unique_links) == 1:
+        return list(unique_links)[0]
+    else:
+        raise Exception("Mais de um link de download encontrado, verificar página.")
 
 # Lendo dados novos
 if not temp.empty:
     arrecadacao = pd.DataFrame()
     for arquivo in temp.links:
-        temp = pd.read_csv(arquivo, sep=';')
+        temp = pd.read_csv(downloadCSV(arquivo), sep=';')
         arrecadacao = pd.concat([arrecadacao, temp[temp['TIPO_RECEITA'] == 'ICMS']])
 
     # Formatando as informações
