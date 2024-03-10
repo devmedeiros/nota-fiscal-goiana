@@ -13,6 +13,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set locale
+        run: |
+          sudo apt-get install -y locales
+          sudo locale-gen pt_PT.UTF-8
+          export LC_ALL=pt_PT.UTF-8
+          export LANG=pt_PT.UTF-8
+        
       - name: Checkout repo
         uses: actions/checkout@v3
 
