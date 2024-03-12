@@ -10,8 +10,13 @@ import plotly.express as px
 # Definindo configurações da página
 st.set_page_config(
         page_title="Nota Fiscal Goiana",
-        page_icon="chart_with_upwards_trend",
+        page_icon="🌽",
         layout="wide",
+        menu_items={
+        'Report a bug': 'https://github.com/devmedeiros/nota-fiscal-goiana/issues/new',
+        'About': '''Desenvolvido e mantido por [Jaqueline Medeiros](http://devmedeiros.com/pt/about/). O código fonte e os dados podem ser acessados no ![github-logo](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWdpdGh1YiI+PHBhdGggZD0iTTE1IDIydi00YTQuOCA0LjggMCAwIDAtMS0zLjVjMyAwIDYtMiA2LTUuNS4wOC0xLjI1LS4yNy0yLjQ4LTEtMy41LjI4LTEuMTUuMjgtMi4zNSAwLTMuNSAwIDAtMSAwLTMgMS41LTIuNjQtLjUtNS4zNi0uNS04IDBDNiAyIDUgMiA1IDJjLS4zIDEuMTUtLjMgMi4zNSAwIDMuNUE1LjQwMyA1LjQwMyAwIDAgMCA0IDljMCAzLjUgMyA1LjUgNiA1LjUtLjM5LjQ5LS42OCAxLjA1LS44NSAxLjY1LS4xNy42LS4yMiAxLjIzLS4xNSAxLjg1djQiLz48cGF0aCBkPSJNOSAxOGMtNC41MSAyLTUtMi03LTIiLz48L3N2Zz4=) 
+    [repositório](https://github.com/devmedeiros/nota-fiscal-goiana/).'''
+    }
     )
 
 # Criando a conexão dos dados
@@ -33,14 +38,14 @@ with st.sidebar:
 
     st.markdown('---')
 
-    #st.markdown('''Desenvolvido e mantido por [Jaqueline Medeiros](http://devmedeiros.com/pt/about/). O código fonte e os dados podem ser acessados no ![github-logo](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWdpdGh1YiI+PHBhdGggZD0iTTE1IDIydi00YTQuOCA0LjggMCAwIDAtMS0zLjVjMyAwIDYtMiA2LTUuNS4wOC0xLjI1LS4yNy0yLjQ4LTEtMy41LjI4LTEuMTUuMjgtMi4zNSAwLTMuNSAwIDAtMSAwLTMgMS41LTIuNjQtLjUtNS4zNi0uNS04IDBDNiAyIDUgMiA1IDJjLS4zIDEuMTUtLjMgMi4zNSAwIDMuNUE1LjQwMyA1LjQwMyAwIDAgMCA0IDljMCAzLjUgMyA1LjUgNiA1LjUtLjM5LjQ5LS42OCAxLjA1LS44NSAxLjY1LS4xNy42LS4yMiAxLjIzLS4xNSAxLjg1djQiLz48cGF0aCBkPSJNOSAxOGMtNC41MSAyLTUtMi03LTIiLz48L3N2Zz4=) 
-    #[repositório](https://github.com/devmedeiros/nota-fiscal-goiana/).''')
+    st.markdown('''Desenvolvido e mantido por [Jaqueline Medeiros](http://devmedeiros.com/pt/about/). O código fonte e os dados podem ser acessados no ![github-logo](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWdpdGh1YiI+PHBhdGggZD0iTTE1IDIydi00YTQuOCA0LjggMCAwIDAtMS0zLjVjMyAwIDYtMiA2LTUuNS4wOC0xLjI1LS4yNy0yLjQ4LTEtMy41LjI4LTEuMTUuMjgtMi4zNSAwLTMuNSAwIDAtMSAwLTMgMS41LTIuNjQtLjUtNS4zNi0uNS04IDBDNiAyIDUgMiA1IDJjLS4zIDEuMTUtLjMgMi4zNSAwIDMuNUE1LjQwMyA1LjQwMyAwIDAgMCA0IDljMCAzLjUgMyA1LjUgNiA1LjUtLjM5LjQ5LS42OCAxLjA1LS44NSAxLjY1LS4xNy42LS4yMiAxLjIzLS4xNSAxLjg1djQiLz48cGF0aCBkPSJNOSAxOGMtNC41MSAyLTUtMi03LTIiLz48L3N2Zz4=) 
+    [repositório](https://github.com/devmedeiros/nota-fiscal-goiana/).''')
 
 # ------------------------------------------------------------------------------------------------------------
 # Definindo o corpo principal
 # ------------------------------------------------------------------------------------------------------------
 
-sorteios = pd.read_sql('select n_sorteio, realizacao from sorteios', con=engine)
+sorteios = pd.read_sql('select n_sorteio, realizacao from sorteios', con=engine, parse_dates={"realizacao": {'format': '%d/%m/%Y'}})
 
 # Filtro UF
 if len(selecao_uf) == 0:
@@ -87,7 +92,9 @@ select
     1 color
 from
     arrecadacao a
-    left join (select date(data_arrecadacao, '-1 month') data_ante, "total" total_y from arrecadacao) b on b.data_ante = a.data_arrecadacao;
+    left join (select date(data_arrecadacao, '-1 month') data_ante, "total" total_y from arrecadacao) b on b.data_ante = a.data_arrecadacao
+where
+    data_arrecadacao > '2010-01-01';
 """
 arrecadacao = pd.read_sql(arrecadacao_query, con=engine, parse_dates={"data_arrecadacao": {'format': '%Y-%m-%d'}})
 
@@ -101,8 +108,8 @@ st.title('Acompanhamento dos Sorteios')
 # Criando indicadores básicos
 col1, col2, col3 = st.columns(3)
 col1.metric("Sorteios Acompanhados", f'{len(sorteios.n_sorteio)}/{max(sorteios.n_sorteio)}')
-col2.metric("Último Sorteio", f'{max(sorteios.realizacao)}')
-col3.metric("Total Sorteado", f'{sum(resultados["soma_premio"])}')
+col2.metric("Último Sorteio", f'{max(sorteios.realizacao).strftime("%d/%m/%Y")}')
+col3.metric("Total Sorteado", f'{sum(resultados.soma_premio)}')
 
 st.markdown('---')
 

@@ -1,4 +1,8 @@
 [theme]
-base="light"
-primaryColor="#29670c"
-textColor="#030f56"
+    base="light"
+    primaryColor="#29670c"
+    textColor="#030f56"
+
+[client]
+    caching = true
+    showErrorDetails = false
