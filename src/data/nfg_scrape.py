@@ -10,6 +10,9 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy import Integer, String, Numeric
 from cryptography.fernet import Fernet
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import time
 
 # Carregando variáveis de ambiente
 load_dotenv()
@@ -18,10 +21,16 @@ load_dotenv()
 caminho_script = os.path.dirname(os.path.abspath(__file__))
 caminho_db = os.path.abspath(os.path.join(caminho_script, '../../database/nf-goiana.db'))
 
-url = 'https://www.economia.go.gov.br/sorteios/index.php?option=com_content&view=article&layout=edit&id=7388'
-page = requests.get(url)
+url = 'https://goias.gov.br/nfgoiana/numero-dos-sorteios/'
 
-soup = BeautifulSoup(page.text, features="lxml")
+# Configurações do navegador
+options = webdriver.FirefoxOptions()
+options.add_argument("-headless")
+browser = webdriver.Firefox(options=options)
+
+browser.get(url)
+
+soup = BeautifulSoup(browser.page_source, 'html.parser')
 
 table = soup.find('table')
 sorteios = pd.read_html(str(table))[0]
@@ -30,7 +39,7 @@ sorteios = sorteios[1:]
 sorteios.columns = new_header
 
 # Configurando os links dos resultados
-url_base = 'https://www.economia.go.gov.br'
+url_base = 'https://goias.gov.br'
 
 url_resultados = []
 j = 0
@@ -44,11 +53,23 @@ for i in table.find_all('a'):
 
 sorteios['links'] = url_resultados
 
+# Organizando as colunas
+sorteios.columns = ['n_sorteio', 'realizacao', 'url_resultado']
+
+# Criando conexão com o database
+engine = create_engine(f'sqlite:///{caminho_db}')
+
+# Se o scrap trouxe dados novos, adiciona
+sorteios_ = pd.read_sql('select n_sorteio from sorteios', con=engine)
+sorteios_lista = list(sorteios_.n_sorteio)
+sorteios = sorteios[~sorteios.n_sorteio.isin(sorteios_lista)]
+
 # Links dos PDFs
 url_pdf = []
-for link in sorteios.links:
-    page = requests.get(link)
-    soup = BeautifulSoup(page.text, features="lxml")
+for link in sorteios.url_resultado:
+    browser.get(link)
+    time.sleep(5)
+    soup = BeautifulSoup(browser.page_source, 'html.parser')
     url_ = soup.find('a', attrs={'class': 'btn btn-success'})['href']
     if url_[0] == 'h':
         url_pdf.append(url_)
@@ -57,19 +78,9 @@ for link in sorteios.links:
 
 sorteios['url_pdf'] = url_pdf
 
-# Organizando as colunas
-sorteios.columns = ['n_sorteio', 'realizacao', 'url_resultado', 'url_pdf']
-
 # Formatando n_sorteio para ter apenas 2 dígitos
 for i in sorteios.index:
     sorteios.loc[i, 'n_sorteio'] = int(sorteios.loc[i, 'n_sorteio'][:2])
-
-# Criando conexão com o database
-engine = create_engine(f'sqlite:///{caminho_db}')
-
-# Se o scrap trouxe dados novos, adiciona
-sorteios_ = pd.read_sql('select n_sorteio from sorteios', con=engine)
-sorteios = sorteios[~sorteios.n_sorteio.isin(sorteios_.n_sorteio)]
 
 # Afirmando tipo dos sorteios
 dsorteios = {
@@ -87,6 +98,8 @@ dtypes = {
         'url_resultado': String(200),
         'url_pdf': String(200)
     }
+
+sorteios = sorteios[~sorteios.n_sorteio.isin(sorteios_lista)]
 
 if not sorteios.empty:
     # Salvando sorteios no banco de dados
