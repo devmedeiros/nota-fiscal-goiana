@@ -31,12 +31,8 @@ jobs:
       - name: Install requirements
         run: pip3 install -r requirements.txt
 
-    - name: Download and set up WebDriver
-      run: |
-        wget https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz
-        tar -xvzf geckodriver-v0.34.0-linux64.tar.gz
-        mv geckodriver /usr/local/bin/geckodriver
-        chmod +x /usr/local/bin/geckodriver
+      - name: Setup Geckodriver
+        uses: browser-actions/setup-geckodriver@v0.0.0
 
       - name: Run nfg_scrape.py
         env:
