@@ -121,6 +121,8 @@ if not sorteios.empty:
                 data[2] = data[2][data[2].columns[data[2].isnull().mean() < 0.9]]
                 data[2].columns = range(len(data[2].columns))
         data = pd.concat([data[0],data[1],data[2]])
+        os.remove(file)
+        print('Arquivo removido')
         return data
 
     dicionario = {
@@ -161,10 +163,25 @@ if not sorteios.empty:
             temp['uf'] = np.nan
         return temp
 
+    def downloadPDF(url):
+        try:
+            browser.get(url)
+        except:
+            for i in os.listdir(caminho_script):
+                if i.lower().endswith('.pdf'):
+                    print('Arquivo baixado')
+                    pdf_path = caminho_script+'/'+i
+                    return pdf_path
+            sys.exit(1)
+
+    # Define um timeout de 5 segundos
+    browser.set_page_load_timeout(5)
+
     # Tratamento dos dados
     resultados = pd.DataFrame()
     for index in sorteios.index:
-        temp = read_pdfs(sorteios.loc[index, 'url_pdf'])
+        pdf_path = downloadPDF(sorteios.loc[index, 'url_pdf'])
+        temp = read_pdfs(pdf_path)
         temp = trataTabela(temp, sorteios.loc[index, 'n_sorteio'])
         resultados = pd.concat([resultados, temp])
 
