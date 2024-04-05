@@ -26,6 +26,11 @@ url = 'https://goias.gov.br/nfgoiana/numero-dos-sorteios/'
 # Configurações do navegador
 options = webdriver.FirefoxOptions()
 options.add_argument("-headless")
+options.set_preference('browser.download.folderList', 2)
+options.set_preference('browser.download.dir', caminho_script)
+options.set_preference('browser.helperApps.neverAsk.saveToDisk', 'application/pdf')
+options.set_preference("browser.download.manager.showWhenStarting", False)
+options.set_preference("pdfjs.disabled", True)
 browser = webdriver.Firefox(options=options)
 
 browser.get(url)
