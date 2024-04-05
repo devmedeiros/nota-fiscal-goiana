@@ -1,3 +1,10 @@
+2024-04-04  Jaqueline Medeiros  <jaqueline@devmedeiros.com>
+
+    Reescrevendo o nfg_scrape.py para utilizar Selenium e aplicado uma correção que diminui as requisições no portal da Nota Fiscal Goiana.
+
+	* Modificado nfg_scrape.py
+    * Modificado scrape.yml
+
 2024-03-11  Jaqueline Medeiros  <jaqueline@devmedeiros.com>
 
     Criando Changelog, aposentando o Power Bi, e apresentando o Streamlit
