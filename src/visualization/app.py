@@ -8,8 +8,6 @@ import datetime
 import plotly.express as px
 import locale
 
-locale.setlocale(locale.LC_ALL, 'pt_PT.UTF-8')
-
 # Definindo configurações da página
 st.set_page_config(
         page_title="Nota Fiscal Goiana",
@@ -48,7 +46,7 @@ with st.sidebar:
 # Definindo o corpo principal
 # ------------------------------------------------------------------------------------------------------------
 
-sorteios = pd.read_sql('select n_sorteio, realizacao from sorteios', con=engine, parse_dates={"realizacao": {'format': '%d/%m/%Y'}})
+sorteios = pd.read_sql('select n_sorteio, realizacao from sorteios', con=engine)
 
 # Filtro UF
 if len(selecao_uf) == 0:
