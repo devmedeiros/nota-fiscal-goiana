@@ -6,6 +6,9 @@ import pandas as pd
 from sqlalchemy import create_engine
 import datetime
 import plotly.express as px
+import locale
+
+locale.setlocale(locale.LC_ALL, 'pt_PT.UTF-8')
 
 # Definindo configurações da página
 st.set_page_config(
@@ -108,8 +111,8 @@ st.title('Acompanhamento dos Sorteios')
 # Criando indicadores básicos
 col1, col2, col3 = st.columns(3)
 col1.metric("Sorteios Acompanhados", f'{len(sorteios.n_sorteio)}/{max(sorteios.n_sorteio)}')
-col2.metric("Último Sorteio", f'{max(sorteios.realizacao).strftime("%d/%m/%Y")}')
-col3.metric("Total Sorteado", f'{sum(resultados.soma_premio)}')
+col2.metric("Último Sorteio", f'{max(sorteios.realizacao)}')
+col3.metric("Total Sorteado", f'R$ {sum(resultados.soma_premio):,}'.replace(',','.'))
 
 st.markdown('---')
 
@@ -126,7 +129,8 @@ config_dict = {
 # Resumo da distribuição do sorteio
 with st.container():
     col1, col2 = st.columns([2, 1])
-    col1.dataframe(data=resultados.iloc[:,:5], hide_index=True, column_config=config_dict, use_container_width=True, height=400)
+    resultados_ = resultados.iloc[:,:5].style.format(precision=2, thousands='.',decimal=',')
+    col1.dataframe(data=resultados_, hide_index=True, column_config=config_dict, use_container_width=True, height=400)
     p1 = px.scatter_mapbox(resultados[~resultados.latitude.isnull()], lat='latitude', lon='longitude', hover_name="municipio",
      hover_data=['uf', 'soma_premio', 'media_premio', 'qtde_premio'], zoom=3, color_discrete_sequence=['#FCC016'], height=400)
     p1.update_layout(mapbox_style="open-street-map")
@@ -162,7 +166,7 @@ st.markdown('---')
 # criação das medidas
 st.subheader('Variação Média')
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("Antes do programa", f'{round(ante_programa.variacao.mean(),2)}')
-col2.metric("Após o ínicio do programa", f'{round(dps_programa.variacao.mean(),2)}')
-col3.metric("Início da pausa", f'{round(ante_pausa.variacao.mean(),2)}')
-col4.metric("Após a pausa", f'{round(dps_pausa.variacao.mean(),2)}')
+col1.metric("Antes do programa", f'{round(ante_programa.variacao.mean(),2):.2n}')
+col2.metric("Após o ínicio do programa", f'{round(dps_programa.variacao.mean(),2):.2n}')
+col3.metric("Início da pausa", f'{round(ante_pausa.variacao.mean(),2):.2n}')
+col4.metric("Após a pausa", f'{round(dps_pausa.variacao.mean(),2):.2n}')
