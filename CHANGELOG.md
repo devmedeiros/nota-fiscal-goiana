@@ -1,3 +1,11 @@
+2024-05-01  Jaqueline Medeiros  <jaqueline@devmedeiros.com>
+
+    Reescrevendo o nfg_scrape.py para se adequar ao novo layout do portal da Nota Fiscal Goiana, aproveitando para organizar o banco nf-goiana e salvar os dados no formato correto.
+
+	* Modificado nf-goiana.db adicionando constraints, removendo colunas obsoletas e corrigindo formato de dados
+    * Modificado app.py para adequar as mudanças do banco de dados e corrigir formatação dos dados
+    * Modificado nfg_scrape.py para adequar ao novo layout do site e melhorando a forma de salvar os dados
+
 2024-04-04  Jaqueline Medeiros  <jaqueline@devmedeiros.com>
 
     Reescrevendo o nfg_scrape.py para utilizar Selenium e aplicado uma correção que diminui as requisições no portal da Nota Fiscal Goiana.

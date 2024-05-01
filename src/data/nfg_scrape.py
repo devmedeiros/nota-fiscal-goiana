@@ -13,6 +13,7 @@ from cryptography.fernet import Fernet
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
+from datetime import datetime
 
 # Carregando variáveis de ambiente
 load_dotenv()
@@ -61,12 +62,15 @@ sorteios['links'] = url_resultados
 # Organizando as colunas
 sorteios.columns = ['n_sorteio', 'realizacao', 'url_resultado']
 
+sorteios['n_sorteio'] = sorteios.n_sorteio.str.split('/')
+sorteios = sorteios.explode('n_sorteio')
+
 # Criando conexão com o database
 engine = create_engine(f'sqlite:///{caminho_db}')
 
 # Se o scrap trouxe dados novos, adiciona
 sorteios_ = pd.read_sql('select n_sorteio from sorteios', con=engine)
-sorteios_lista = list(sorteios_.n_sorteio)
+sorteios_lista = [str(a) for a in sorteios_.n_sorteio]
 sorteios = sorteios[~sorteios.n_sorteio.isin(sorteios_lista)]
 
 # Links dos PDFs
@@ -75,7 +79,7 @@ for link in sorteios.url_resultado:
     browser.get(link)
     time.sleep(5)
     soup = BeautifulSoup(browser.page_source, 'html.parser')
-    url_ = soup.find('a', attrs={'class': 'btn btn-success'})['href']
+    url_ = soup.find('a', attrs={'data-type': 'attachment'})['href']
     if url_[0] == 'h':
         url_pdf.append(url_)
     else:
@@ -83,9 +87,8 @@ for link in sorteios.url_resultado:
 
 sorteios['url_pdf'] = url_pdf
 
-# Formatando n_sorteio para ter apenas 2 dígitos
-for i in sorteios.index:
-    sorteios.loc[i, 'n_sorteio'] = int(sorteios.loc[i, 'n_sorteio'][:2])
+# Formatando realizacao
+sorteios['realizacao'] = [datetime.strptime(x, "%d/%m/%Y").strftime("%Y-%m-%d") for x in sorteios.realizacao]
 
 # Afirmando tipo dos sorteios
 dsorteios = {
@@ -97,26 +100,18 @@ dsorteios = {
 
 sorteios = sorteios.astype(dsorteios)
 
-dtypes = {
-        'n_sorteio': Integer,
-        'realizacao': String(200),
-        'url_resultado': String(200),
-        'url_pdf': String(200)
-    }
-
-sorteios = sorteios[~sorteios.n_sorteio.isin(sorteios_lista)]
-
 if not sorteios.empty:
     # Salvando sorteios no banco de dados
-    sorteios.to_sql(name='sorteios', con=engine, index=False, if_exists='append', dtype=dtypes)
+    sorteios[['n_sorteio','realizacao']].to_sql(name='sorteios', con=engine, index=False, if_exists='append')
 
     # Definindo função de ler os PDFs
     def read_pdfs(file):
         try:
-            data = tb.read_pdf(file, pages = 'all', pandas_options={'header': None})
+            data = tb.read_pdf(file, pages = 'all', pandas_options={'header': None}) # Tenta ler o PDF sem especificar o cabeçalho
         except:
-            data = tb.read_pdf(file, pages = 'all', pandas_options={'header': None}, stream=True)
-            if not (data[0].shape[1] == data[1].shape[1] == data[2].shape[1]):
+            data = tb.read_pdf(file, pages = 'all', pandas_options={'header': None}, stream=True) # Se houver erro, tenta ler o PDF em modo de stream
+            if not (data[0].shape[1] == data[1].shape[1] == data[2].shape[1]):# Verifica se as dimensões dos DataFrames extraídos são diferentes
+                # Filtra colunas com mais de 90% de valores nulos e renomeia as colunas
                 data[0] = data[0][data[0].columns[data[0].isnull().mean() < 0.9]]
                 data[0].columns = range(len(data[0].columns))
 
@@ -151,19 +146,25 @@ if not sorteios.empty:
         temp.columns = new_header
         temp.rename(columns=dicionario, inplace=True)
 
+        # Verifica se há apenas uma coluna com valor NaN
         if temp.columns.isna().sum() == 1:
+            # Se 'municipio' não estiver presente, preenche a coluna NaN com 'municipio'
             if not ('municipio' in temp.columns):
                 temp.columns = temp.columns.fillna('municipio')
+            # Se 'nome' não estiver presente, preenche a coluna NaN com 'nome'
             elif not ('nome' in temp.columns):
                 temp.columns = temp.columns.fillna('nome')
+            # Se 'valor_premio' não estiver presente, preenche a coluna NaN com 'valor_premio'
             elif not ('valor_premio' in temp.columns):
                 temp.columns = temp.columns.fillna('valor_premio')
         else:
-            temp.columns.values[int(np.where(temp.columns == 'n_bilhete')[0])+1] = 'nome'
-            temp.columns.values[int(np.where(temp.columns == 'nome')[0])+1] = 'municipio'
+            temp.columns.values[int(np.where(temp.columns == 'n_bilhete')[0])+1] = 'nome' # Renomeia a coluna após 'n_bilhete' como 'nome'
+            temp.columns.values[int(np.where(temp.columns == 'nome')[0])+1] = 'municipio' # Renomeia a coluna após 'nome' como 'municipio'
+        # Se 'n_sorteio' não estiver presente, cria uma coluna 'n_sorteio' e atribui o valor de 'sorteio'
         if not ('n_sorteio' in temp.columns):
             temp['n_sorteio'] = str(sorteio)
-        temp.n_sorteio = temp.n_sorteio.astype(str).str.strip()
+        temp.n_sorteio = temp.n_sorteio.astype(str).str.strip() # Remove espaços em branco da coluna 'n_sorteio'
+        # Se 'uf' não estiver presente, cria uma coluna 'uf' com valores NaN
         if not ('uf' in temp.columns):
             temp['uf'] = np.nan
         return temp
