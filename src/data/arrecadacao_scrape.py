@@ -69,7 +69,7 @@ if not temp.empty:
     arrecadacao['total'] = [pd.to_numeric(x.replace(',', '.')) for x in arrecadacao['VALR_TOTAL']]
     arrecadacao['data_arrecadacao'] = [date(year=arrecadacao.ano[i], month=arrecadacao.mes[i], day=1) for i in arrecadacao.index]
 
-    arrecadacao = arrecadacao[['ano', 'mes', 'data_arrecadacao', 'total']]
+    arrecadacao = arrecadacao[['data_arrecadacao', 'total']]
 
     # Salvando as informações novas
     arrecadacao.to_sql(name = 'arrecadacao', con=engine, index=False, if_exists='append')
