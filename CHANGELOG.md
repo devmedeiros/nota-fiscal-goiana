@@ -1,3 +1,10 @@
+2024-06-02  Jaqueline Medeiros  <jaqueline@devmedeiros.com>
+
+    Reescrevendo o nfg_scrape.py para encontrar o link do PDF usando um método mais genérico.
+
+    * Modificado nfg_scrape.py
+    * Modificado scrape.yml para rodar também quando houver push na branch main
+
 2024-05-01  Jaqueline Medeiros  <jaqueline@devmedeiros.com>
 
     Reescrevendo o nfg_scrape.py para se adequar ao novo layout do portal da Nota Fiscal Goiana, aproveitando para organizar o banco nf-goiana e salvar os dados no formato correto.

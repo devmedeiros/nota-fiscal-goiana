@@ -79,7 +79,9 @@ for link in sorteios.url_resultado:
     browser.get(link)
     time.sleep(5)
     soup = BeautifulSoup(browser.page_source, 'html.parser')
-    url_ = soup.find('a', attrs={'data-type': 'attachment'})['href']
+    for a in soup.findAll('a', href=True): #Encontra todos os links da página que possuem href
+        if '.pdf' in a['href']: #Se o link conter .pdf
+            url_ = a['href'] #Salva como url do resultado
     if url_[0] == 'h':
         url_pdf.append(url_)
     else:
