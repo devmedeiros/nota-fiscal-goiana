@@ -1,3 +1,10 @@
+2025-01-07  Jaqueline Medeiros  <jaqueline@devmedeiros.com>
+
+    Atualizando o requirements e importando o pacote sys.
+
+    * Modificado arrecadacao_scrape.py
+    * Modificado requirements.txt
+
 2024-06-02  Jaqueline Medeiros  <jaqueline@devmedeiros.com>
 
     Reescrevendo o nfg_scrape.py para encontrar o link do PDF usando um método mais genérico.
