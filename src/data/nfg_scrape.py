@@ -14,6 +14,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
 from datetime import datetime
+import sys
 
 # Carregando variáveis de ambiente
 load_dotenv()
