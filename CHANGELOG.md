@@ -1,8 +1,8 @@
 2025-01-07  Jaqueline Medeiros  <jaqueline@devmedeiros.com>
 
-    Atualizando o requirements e importando o pacote sys.
+    Atualizando o requirements e corrigindo o nfg_scrape para quando houver um pdf para mais de um sorteio.
 
-    * Modificado arrecadacao_scrape.py
+    * Modificado nfg_scrape.py
     * Modificado requirements.txt
 
 2024-06-02  Jaqueline Medeiros  <jaqueline@devmedeiros.com>

@@ -105,6 +105,7 @@ sorteios = sorteios.astype(dsorteios)
 
 if not sorteios.empty:
     # Salvando sorteios no banco de dados
+    sorteios.reset_index(drop=True, inplace=True)
     sorteios[['n_sorteio','realizacao']].to_sql(name='sorteios', con=engine, index=False, if_exists='append')
 
     # Definindo função de ler os PDFs
@@ -174,8 +175,12 @@ if not sorteios.empty:
 
     def downloadPDF(url):
         try:
-            browser.get(url)
-        except:
+            if isinstance(url, str):
+                browser.get(url)
+            else:
+                browser.get(url[0])
+        except Exception as e:
+            print('Ocorreu um erro (nem todo erro é ruim): ', e)
             for i in os.listdir(caminho_script):
                 if i.lower().endswith('.pdf'):
                     print('Arquivo baixado')
