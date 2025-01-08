@@ -200,6 +200,7 @@ if not sorteios.empty:
         resultados = pd.concat([resultados, temp])
 
     resultados = resultados.loc[:,['n_sorteio', 'n_premio', 'n_bilhete', 'nome', 'municipio', 'uf', 'valor_premio']]
+    resultados.drop_duplicates(keep='first', inplace=True)
     resultados.reset_index(drop=True, inplace=True)
 
     for i in resultados[resultados.valor_premio.isna()].index:
