@@ -7,15 +7,13 @@ from datetime import date, datetime
 import os
 import re
 import locale
+from config import BASE_DIR
+from db import get_engine
 
 locale.setlocale(locale.LC_ALL, 'pt_PT.UTF-8')
 
-# Definindo caminhos
-caminho_script = os.path.dirname(os.path.abspath(__file__))
-caminho_db = os.path.abspath(os.path.join(caminho_script, '../../database/nf-goiana.db'))
-
 # Criando engine
-engine = create_engine(f'sqlite:///{caminho_db}')
+engine = get_engine()
 
 url = 'https://dadosabertos.go.gov.br/dataset/arrecadacao'
 page = requests.get(url)

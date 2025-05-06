@@ -15,6 +15,8 @@ from selenium.webdriver.common.by import By
 import time
 from datetime import datetime
 import sys
+from config import BASE_DIR, DB_PATH, KEY_GOIANA
+from db import get_engine
 
 # Carregando variáveis de ambiente
 load_dotenv()
@@ -67,7 +69,7 @@ sorteios['n_sorteio'] = sorteios.n_sorteio.str.split('/')
 sorteios = sorteios.explode('n_sorteio')
 
 # Criando conexão com o database
-engine = create_engine(f'sqlite:///{caminho_db}')
+engine = get_engine()
 
 # Se o scrap trouxe dados novos, adiciona
 sorteios_ = pd.read_sql('select n_sorteio from sorteios', con=engine)
