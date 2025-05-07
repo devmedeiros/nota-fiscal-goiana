@@ -30,4 +30,4 @@ jobs:
       - name: Run check_variable.py
         env:
           KEY_GOIANA: ${{ secrets.KEY_GOIANA }}
-        run: python src/data/nfg_scrape.py
+        run: python src/data/check_variable.py
